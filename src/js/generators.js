@@ -10,7 +10,13 @@
  */
 export function* characterGenerator(allowedTypes, maxLevel) {
   // TODO: write logic here
+  while (true) {
+    const type = Math.floor(Math.random() * allowedTypes.length);
+    const level = Math.floor(1 + (Math.random() * maxLevel));
+          yield new allowedTypes[type](level);
+  }
 }
+
 
 /**
  * Формирует массив персонажей на основе characterGenerator
@@ -21,4 +27,13 @@ export function* characterGenerator(allowedTypes, maxLevel) {
  * */
 export function generateTeam(allowedTypes, maxLevel, characterCount) {
   // TODO: write logic here
+  const team = [];
+  const char = characterGenerator(allowedTypes, maxLevel);
+
+  for (let i = 0; i < characterCount; i +=1) { 
+    team.push(char.next().value);
+    
+  }
+
+  return team;
 }

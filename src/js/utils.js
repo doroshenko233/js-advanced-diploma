@@ -23,9 +23,24 @@
  * ```
  * */
 export function calcTileType(index, boardSize) {
-  // TODO: ваш код будет тут
-  return 'center';
+ 
+  switch (true) {
+    case index === 0: return "top-left";
+    case index === 7: return "top-right";
+    case index === 56: return "bottom-left";
+    case index === 63: return "bottom-right";
+    case index < boardSize: return "top";
+    case index > boardSize * (boardSize - 1): return "bottom";
+    case index % boardSize === 0: return "left";
+    case index % boardSize === boardSize - 1: return "right";
+    default: return 'center';
+  }
 }
+
+console.log(calcTileType(0, 8)); 
+console.log(calcTileType(1, 8)); 
+console.log(calcTileType(63, 8)); 
+console.log(calcTileType(7, 7)); 
 
 export function calcHealthLevel(health) {
   if (health < 15) {
