@@ -15,6 +15,7 @@ let checkedDistanceAttack;
 let checkedPosition;
 let boardSize;
 
+
 export default class GameController {
   constructor(gamePlay, stateService) {
     this.gamePlay = gamePlay;
@@ -76,20 +77,26 @@ export default class GameController {
       this.computerTeam = generateTeam(
         Team.getComputerTeam(), 4, (this.playerTeam.length + this.playerPositions.length),
       );
-      this.setPositionCharacter(this.playerTeam, this.computerTeam);
-      return;
+       this.setPositionCharacter(this.playerTeam, this.computerTeam);
+      
+    } else if (this.level === 5) {
+      this.blockedBoard = false;
+      GamePlay.showMessage('Вы победили!!!');
     }
 
-    const characterPositions = this.getPositions(this.playerPositions.length);
-    for (let i = 0; i < this.playerPositions.length; i += 1) {
-      this.playerPositions[i].position = characterPositions.player[i];
-      this.computerPositions[i].position = characterPositions.computer[i];
-    }
-
+    if (this.playerPositions.length > 0 && this.computerPositions.length > 0) {
+      const characterPositions = this.getPositions(this.playerPositions.length);
+        for (let i = 0; i < this.playerPositions.length; i += 1) {
+          this.playerPositions[i].position = characterPositions.player[i];
+          this.computerPositions[i].position = characterPositions.computer[i];
+        }
+    } 
+       
     this.gamePlay.drawUi(this.initTheme);
     this.gamePlay.redrawPositions([...this.playerPositions, ...this.computerPositions]);
+    this.point = 0;
   }
-
+  
   setPositionCharacter(playerTeam, computerTeam) {
     for (let i = 0; i < playerTeam.length; i += 1) {
       this.playerPositions.push(new PositionedCharacter(playerTeam[i], 0));
@@ -222,13 +229,14 @@ export default class GameController {
           this.gamePlay.setCursor(cursors.crosshair);
         } else {
           this.gamePlay.setCursor(cursors.notallowed);
-        }
+        } 
       }
     }
   }
 
   onCellLeave(index) {
     // TODO: react to mouse leave
+    this.index = index;
     if (this.selectedCharacter.position !== index) {
       this.gamePlay.deselectCell(index);
     }
@@ -266,7 +274,10 @@ export default class GameController {
         if (this.computerPositions.length > 0) {
           this.computerStrategy();
         }
-      }
+      } 
+    }
+    if (this.getIndex(this.computerPositions) && (this.getIndex(this.computerPositions) !== -1)) {
+        GamePlay.showError('Вы не можете ходить этим персонажем, это персонаж компьютера');
     }
   }
   getIndex(arr) {
@@ -289,7 +300,7 @@ export default class GameController {
         (item) => item.position !== target.position,
       );
       if (this.playerPositions.length === 0) {
-        GamePlay.showMessage('Вы проиграли !!!');
+        GamePlay.showMessage(`Вы проиграли!!!Количество набранных очков: ${this.point}`);
         this.blockedBoard = true;
       }
       if (this.computerPositions.length === 0) {
@@ -313,6 +324,8 @@ export default class GameController {
       current.defence = this.attackAndDefenceLevelUp(current.defence, current.health);
       current.health = (current.health + 80) < 100 ? current.health + 80 : 100;
     }
+     this.point += this.playerPositions.reduce((acc, item) => acc + item.character.health, 0);
+     GamePlay.showMessage(`Вы прошли уровень ${this.level} Количество набранных очков: ${this.point}`);
   }
 
   attackAndDefenceLevelUp(attackBefore, life) {
@@ -342,8 +355,9 @@ export default class GameController {
         if (target !== null) {
           this.computersAttack(computer.character, target);
           return;
-        }
+         }
       }
+
       const randomIndex = Math.floor(Math.random() * [...this.computerPositions].length);
       const randomComputer = [...this.computerPositions][randomIndex];
       this.computerMove(randomComputer);
@@ -462,5 +476,4 @@ export default class GameController {
   distanceIndex(row, column) {
     return (row * 8) + column;
   }
-  
 }
