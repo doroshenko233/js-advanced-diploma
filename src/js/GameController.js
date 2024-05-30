@@ -462,4 +462,5 @@ export default class GameController {
   distanceIndex(row, column) {
     return (row * 8) + column;
   }
+  
 }
