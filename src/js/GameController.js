@@ -82,8 +82,10 @@ export default class GameController {
     } else if (this.level === 5) {
       this.blockedBoard = false;
       GamePlay.showMessage('Вы победили!!!');
-    }
-
+      this.playerPositions = [];
+      this.computerPositions = [];
+    } 
+           
     if (this.playerPositions.length > 0 && this.computerPositions.length > 0) {
       const characterPositions = this.getPositions(this.playerPositions.length);
         for (let i = 0; i < this.playerPositions.length; i += 1) {
@@ -91,7 +93,7 @@ export default class GameController {
           this.computerPositions[i].position = characterPositions.computer[i];
         }
     } 
-       
+    
     this.gamePlay.drawUi(this.initTheme);
     this.gamePlay.redrawPositions([...this.playerPositions, ...this.computerPositions]);
     this.point = 0;
@@ -301,13 +303,16 @@ export default class GameController {
       );
       if (this.playerPositions.length === 0) {
         GamePlay.showMessage(`Вы проиграли!!!Количество набранных очков: ${this.point}`);
-        this.blockedBoard = true;
+        this.blockedBoard = false;
+        this.playerPositions = [];
+        this.computerPositions = [];
+        this.gameStart();
       }
       if (this.computerPositions.length === 0) {
         for (const item of this.playerPositions) {
           this.point += item.character.health;
         }
-       
+        
         this.levelUp();
         this.level += 1;
         this.gameStart();
